@@ -35,4 +35,6 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 	testCompile('io.projectreactor:reactor-test')
+	testCompile('javax.el:javax.el-api:3.0.0')
+	testCompile('org.glassfish:javax.el:3.0.0')
 }
