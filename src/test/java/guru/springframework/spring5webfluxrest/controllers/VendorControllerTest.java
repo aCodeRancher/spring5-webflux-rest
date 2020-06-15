@@ -66,4 +66,40 @@ public class VendorControllerTest {
                 .expectStatus()
                 .isCreated();
     }
+
+    @Test
+    public void testPutNewVendor(){
+        Mono<Boolean> nonexist = Mono.just(false);
+        Mono<Vendor> vendorToProvide = Mono.just(Vendor.builder().firstName("Helen").lastName("Ma").build());
+        Mono<Vendor> vendorToSave = Mono.just(Vendor.builder().id("10").firstName("Helen").lastName("Ma").build());
+
+        BDDMockito.given(vendorRepository.existsById("10")).willReturn(nonexist);
+
+        BDDMockito.given(vendorRepository.save(any(Vendor.class)))
+                .willReturn(vendorToSave);
+           webTestClient.put()
+                .uri("/api/v1/vendors/10")
+                 .body(vendorToProvide, Vendor.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        BDDMockito.verify(vendorRepository,Mockito.times(1)).save(vendorToSave.block());
+    }
+
+    @Test
+    public void testPutExistingVendor(){
+        Mono<Boolean>  exist = Mono.just(true);
+        Mono<Vendor> vendorToProvide = Mono.just(Vendor.builder().id("20").firstName("Helen").lastName("Ma").build());
+        BDDMockito.given(vendorRepository.existsById("20")).willReturn(exist);
+        BDDMockito.given(vendorRepository.findById("20")).willReturn(vendorToProvide);
+        BDDMockito.given(vendorRepository.save(any(Vendor.class)))
+                .willReturn(vendorToProvide);
+        webTestClient.put()
+                .uri("/api/v1/vendors/20")
+                .body(vendorToProvide, Vendor.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        BDDMockito.verify(vendorRepository,Mockito.times(1)).save(vendorToProvide.block());
+    }
 }
