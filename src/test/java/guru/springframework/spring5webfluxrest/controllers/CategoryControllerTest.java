@@ -54,11 +54,10 @@ public class CategoryControllerTest {
 
     @Test
     public void testCreateCateogry() {
+        Category myCategory = Category.builder().description("Some Cat").build();
+        Mono<Category> catToSaveMono = Mono.just(myCategory);
         BDDMockito.given(categoryRepository.saveAll(any(Publisher.class)))
-                .willReturn(Flux.just(Category.builder().description("descrp").build()));
-
-        Mono<Category> catToSaveMono = Mono.just(Category.builder().description("Some Cat").build());
-
+                .willReturn(Flux.just(myCategory));
         webTestClient.post()
                 .uri("/api/v1/categories")
                 .body(catToSaveMono, Category.class)
