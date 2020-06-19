@@ -11,6 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
 public class CategoryControllerTest {
@@ -69,16 +70,19 @@ public class CategoryControllerTest {
 
     @Test
     public void TestUpdate() {
+        Mono<Category> catToUpdateMono = Mono.just(Category.builder().description("Some updated category").build());
         BDDMockito.given(categoryRepository.save(any(Category.class)))
-                .willReturn(Mono.just(Category.builder().build()));
-
-        Mono<Category> catToUpdateMono = Mono.just(Category.builder().description("Some Cat").build());
-
+                .willReturn( catToUpdateMono);
         webTestClient.put()
-                .uri("/api/v1/categories/asdfasdf")
+                .uri("/api/v1/categories/10")
                 .body(catToUpdateMono, Category.class)
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody(Category.class)
+                  .consumeWith(entityExchangeResult ->
+                           assertTrue(entityExchangeResult.getResponseBody().getDescription().equals("Some updated category")));
+
+
     }
 }
