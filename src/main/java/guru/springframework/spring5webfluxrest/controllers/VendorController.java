@@ -1,6 +1,5 @@
 package guru.springframework.spring5webfluxrest.controllers;
 
-
 import guru.springframework.spring5webfluxrest.domain.Vendor;
 import guru.springframework.spring5webfluxrest.repositories.VendorRepository;
 import org.reactivestreams.Publisher;
@@ -41,5 +40,18 @@ public class VendorController {
     Mono<Vendor> update(@PathVariable String id, @RequestBody Vendor vendor){
         vendor.setId(id);
         return vendorRepository.save(vendor);
+    }
+
+    @PatchMapping("/api/v1/vendors/{id}")
+    Mono<Vendor> patch(@PathVariable String id, @RequestBody Vendor vendor) {
+
+        Vendor foundVendor = vendorRepository.findById(id).block();
+
+        if(!foundVendor.getFirstName().equals(vendor.getFirstName())){
+            foundVendor.setFirstName(vendor.getFirstName());
+            return vendorRepository.save(foundVendor);
+        }
+
+        return Mono.just(foundVendor);
     }
 }
